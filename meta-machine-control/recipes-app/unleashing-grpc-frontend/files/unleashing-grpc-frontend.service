@@ -1,0 +1,20 @@
+[Unit]
+Description=Employee User Interface
+After=weston.service
+Wants=weston.service
+
+# Wait for the backend machine control service to be ready.
+After=unleashing-grpc-backend.service
+Requires=unleashing-grpc-backend.service
+
+[Service]
+Type=simple
+ExecStart=flutter-client -f --bundle=/usr/share/apps/frontend/3.24.0/release/ --app-id=org.spindance.frontend
+User=weston                                                                  
+Group=weston
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+Environment=WAYLAND_DISPLAY=wayland-1
+Restart=always
+
+[Install]
+WantedBy=graphical.target

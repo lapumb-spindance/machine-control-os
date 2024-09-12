@@ -6,7 +6,7 @@ shell=kiosk-shell.so
 
 [output]
 mode=preferred
-app-ids=org.lapumb.demo.gallery
+app-ids=org.spindance.frontend
 
 [shell]
 locking=false
