@@ -64,7 +64,7 @@ function prepare_wic_file {
 
     # Check the machine image output for a symbolic link to the .wic file.
     local machine_image_dir="${OUTPUT_IMAGE_DIR}/images/${machine}"
-    local expected_symbolic_wic_filename="${TARGET}-${machine}.wic"
+    local expected_symbolic_wic_filename="${TARGET}-${machine}*.wic*"
     local symbolic_wic_file=$(find $machine_image_dir -name "${expected_symbolic_wic_filename}")
 
     # If the symbolic link to a .wic was not found, look for a compressed wic (.wic.xz) file.
