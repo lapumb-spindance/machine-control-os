@@ -4,3 +4,12 @@
 [submodule "meta-raspberrypi"]
 	path = meta-raspberrypi
 	url = git://git.yoctoproject.org/meta-raspberrypi
+[submodule "meta-flutter"]
+	path = meta-flutter
+	url = https://github.com/meta-flutter/meta-flutter
+[submodule "meta-openembedded"]
+	path = meta-openembedded
+	url = git://git.openembedded.org/meta-openembedded
+[submodule "meta-clang"]
+	path = meta-clang
+	url = https://github.com/kraj/meta-clang
