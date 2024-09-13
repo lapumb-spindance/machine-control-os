@@ -13,6 +13,7 @@ Group=weston
 Environment=XDG_RUNTIME_DIR=/run/user/1000
 Environment=WAYLAND_DISPLAY=wayland-1
 Restart=always
+RestartSec=10
 
 [Install]
 WantedBy=graphical.target
