@@ -5,3 +5,5 @@ export USER_DL_DIR="$BUILD_DIR/downloads"
 export OUTPUT_IMAGE_DIR="${REPO_ROOT}/../build_images"
 export USER_BB_NUMBER_THREADS=$(nproc)
 export USER_PARALLEL_MAKE=$(nproc)
+export NETWORK_SSID="my-network"
+export NETWORK_PASSWORD="my-password"
