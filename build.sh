@@ -53,44 +53,14 @@ function copy_build_images {
     echo "Successfully copied generated images ($build_image_dir) into '${OUTPUT_IMAGE_DIR}'"
 }
 
-# Find the correct *.wic* file that was generated.
+# Find the latest wic file, which is probably a symlink.
 #
 # Args: None
 #
 # Returns: None
 function prepare_wic_file {
-    # The generated *.wic* file is expected to be in the $OUTPUT_IMAGE_DIR/images/<machine>/ directory.
-    local machine=$(./execute_bitbake.sh -e | grep "^MACHINE=" | cut -d'"' -f2)
-
-    # Check the machine image output for a symbolic link to the .wic file.
-    local machine_image_dir="${OUTPUT_IMAGE_DIR}/images/${machine}"
-    local expected_symbolic_wic_filename="${TARGET}-${machine}*.wic*"
-    local symbolic_wic_file=$(find $machine_image_dir -name "${expected_symbolic_wic_filename}")
-
-    # If the symbolic link to a .wic was not found, look for a compressed wic (.wic.xz) file.
-    local compressed=0
-    if [ -z "$symbolic_wic_file" ]; then
-        symbolic_wic_file=$(find $machine_image_dir -name "${expected_symbolic_wic_filename}.xz")
-        compressed=1
-    fi
-
-    # Make sure we found some symbolic link.
-    if [ -z "$symbolic_wic_file" ]; then
-        echo "ERROR: Could not find a symbolic link to a ${expected_symbolic_wic} (or .xz) file in the output image directory."
-        exit 1
-    fi
-
-    # The symbolic link was found - get the actual file name.
-    local wic_file=$(readlink -f $symbolic_wic_file)
-
-    # If the file is compressed, decompress it.
-    local decompressed_wic_file=$wic_file
-    if [ $compressed -eq 1 ]; then
-        xz -d $wic_file
-        decompressed_wic_file="${wic_file%.xz}"
-    fi
-
-    echo "Successfully prepared wic file ($decompressed_wic_file), which can be flashed to an SD card."
+    local wic_file=$(find $OUTPUT_IMAGE_DIR -name "*.wic" | sort -r | head -n 1)
+    echo "Found newest wic file: $wic_file! Use the flash.sh script to flash the image to an SD card."
 }
 
 #############################################
