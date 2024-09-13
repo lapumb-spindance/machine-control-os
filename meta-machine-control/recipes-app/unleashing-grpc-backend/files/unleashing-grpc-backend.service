@@ -6,7 +6,7 @@ Requires=network.target
 
 [Service]
 Type=simple
-ExecStartPre=/bin/bash -c 'while ! ip addr show dev wlan0 | grep -q "inet 1*"; do sleep 1; done'
+ExecStartPre=/bin/sh -c 'while ! ip addr show dev wlan0 | grep "inet [0-9]"; do sleep 1; done'
 ExecStart=flutter-pi --release /usr/share/apps/backend/3.24.0/release/
 User=weston
 Group=weston
