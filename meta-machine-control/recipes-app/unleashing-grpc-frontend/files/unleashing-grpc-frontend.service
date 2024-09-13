@@ -1,5 +1,5 @@
 [Unit]
-Description=Employee User Interface
+Description=gRPC Machine Control frontend
 After=weston.service
 Wants=weston.service
 

@@ -17,7 +17,9 @@ FLUTTER_APPLICATION_PATH = "example/${PUBSPEC_APPNAME}"
 FLUTTER_APPLICATION_INSTALL_PREFIX = "${datadir}/apps"
 FLUTTER_APP_RUNTIME_MODES="release"
 
-FLUTTER_BUILD_ARGS = "bundle --dart-define=HOSTNAME=${MACHINE}.local"
+FLUTTER_BUILD_ARGS = "bundle --dart-define=HOSTNAME='${MACHINE}.local'"
+
+PUBSPEC_IGNORE_LOCKFILE = "1"
 
 inherit flutter-app
 
