@@ -7,17 +7,32 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 SRC_URI = "git://git@github.com/lapumb-spindance/unleashing-grpc.git;protocol=ssh;branch=master"
 
-PV = "1.0+git${SRCPV}"
+### Variables available for override ###
+
+# The commit hash to use for the source code 'master' branch.
 SRCREV ?= "${AUTOREV}"
 
+# The name of the application as defined in the pubspec.yaml file.
 PUBSPEC_APPNAME ?= "${BPN}"
+
+# The hostname to use for gRPC communication.
+GRPC_HOSTNAME ?= "${MACHINE}.local"
+
+# The GPIO number the LED is connected to.
+LED_GPIO ?= "6"
+
+### End of variables available for override ###
+
+PV = "1.0+git${SRCPV}"
+
 S = "${WORKDIR}/git"
 FLUTTER_APPLICATION_PATH = "example/${PUBSPEC_APPNAME}"
 
 FLUTTER_APPLICATION_INSTALL_PREFIX = "${datadir}/apps"
 FLUTTER_APP_RUNTIME_MODES="release"
 
-FLUTTER_BUILD_ARGS = "bundle --dart-define=HOSTNAME='${MACHINE}.local'"
+FLUTTER_BUILD_ARGS = "bundle --dart-define=HOSTNAME=\"${GRPC_HOSTNAME}\" --dart-define=GPIO=${LED_GPIO}"
+APP_AOT_EXTRA = "-DHOSTNAME=\"${GRPC_HOSTNAME}\" -DGPIO=${LED_GPIO}"
 
 PUBSPEC_IGNORE_LOCKFILE = "1"
 
