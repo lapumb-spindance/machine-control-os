@@ -1,5 +1,5 @@
 {
-    "name": "yocto-starter-kit",
+    "name": "machine-control-os",
     "dockerFile": "Dockerfile",
     "features": {
       "ghcr.io/devcontainers/features/common-utils:2": {
@@ -31,7 +31,7 @@
             ]
         }
     },
-    "workspaceMount": "source=${localWorkspaceFolder},target=/home/sd-dev/src/yocto-starter-kit,type=bind,consistency=cached",
-    "workspaceFolder": "/home/sd-dev/src/yocto-starter-kit",
-    "runArgs": ["--name", "yocto-starter-kit"]
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/sd-dev/src/machine-control-os,type=bind,consistency=cached",
+    "workspaceFolder": "/home/sd-dev/src/machine-control-os",
+    "runArgs": ["--name", "machine-control-os"]
 }

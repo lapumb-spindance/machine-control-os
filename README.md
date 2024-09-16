@@ -1,6 +1,12 @@
-# yocto-starter-kit
+# machine-control-os
 
-This repository utilizes the [Yocto Project](https://www.yoctoproject.org/)'s [Poky](https://www.yoctoproject.org/software-item/poky/) reference distribution and is meant to be a starting point for embedded Linux development.
+This repository utilizes the [Yocto Project](https://www.yoctoproject.org/)'s [Poky](https://www.yoctoproject.org/software-item/poky/) reference distribution to a create the `core-image-base` image for the [Raspberry Pi 4](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/) with a custom layer ([meta-machine-control](meta-machine-control/README.md)) that contains the necessary recipes to include the [unleashing_grpc](https://github.com/lapumb-spindance/unleashing-grpc) Flutter backend and frontend applications as services. The OS itself is very simple and is responsible for three things:
+
+1. Connecting to the network (via wifi or ethernet)
+1. Spinning up the [`unleashing-grpc-backend.service`](meta-machine-control/recipes-app/unleashing-grpc-backend/files/unleashing-grpc-backend.service), which spins up a gRPC server and controls the state of the connected LED
+1. Spinning up the [`unleashing-grpc-frontend.service`](meta-machine-control/recipes-app/unleashing-grpc-frontend/files/unleashing-grpc-frontend.service), which spins up a Flutter application that connects to the gRPC server and allows the user to control the state of the connected LED
+
+>Note: if you are interested in learning more about embedded Flutter, checkout the [meta-flutter](https://github.com/meta-flutter/meta-flutter) repository and the ["_Getting Started with Flutter for Embedded Linux_" blog](https://spindance.com/2024/07/10/getting-started-with-flutter-for-embedded-linux-2/)!
 
 ## Prerequisites
 
@@ -15,7 +21,7 @@ If you are on a Windows 11 (or 10) host, see [windows_11_setup_steps.md](docs/wi
 Clone this repository:
 
 ```bash
-git clone --recursive git@github.com:spindance/yocto-starter-kit.git
+git clone --recursive git@github.com:lapumb-spindance/machine-control-os.git
 ```
 
 >Note: if you do not add the `--recursive` flag, run `./tools/update_submodules.sh` once the repository has successfully been cloned.
@@ -74,7 +80,7 @@ If you do not want to use VSCode, you can still use the containerized environmen
 
 >To exit the container, enter the `exit` command.
 
-#### Important Note about Containerized Development
+#### Important Note Regarding Containerized Development
 
 It has been observed that errors occur when attempting to enter the container in VS Code after having already entered the container from the command line (and / or vice-versa). If you run into this issue, delete the image / container that was spun up by the other method and try again. **That said, it is probably best to stick to one method of entering the container until we figure out a more graceful solution**.
 
@@ -98,6 +104,8 @@ This can be done manually, or you can use [direnv](https://direnv.net/) (`sudo a
 
 The `.envrc` file also sources a `.userenv` file if one is available. This file is ignored by git, so you can add any custom environment variables or overwrite any existing environment variables you see fit. For an example `.userenv` file, see the [example](.userenv.example) file.
 
+Two particularly useful environment variables suggested to `export` in the `.userenv` file are `NETWORK_SSID` and `NETWORK_PASSWORD`. These variables are used to configure `wpa_supplicant` on the image so the Raspberry Pi automatically connects to your network upon boot.
+
 ### The `bitbake` Command
 
 This repository is setup in a way that makes it simple for multiple developers to contribute to the same project. In order to achieve this, several custom environment variables have to be sent to `bitbake` to map dynamic paths correctly. Because of this, using the raw `bitbake` command **will not work**. Instead, utilize the `execute_bitbake.sh` script to properly source the environment variables and execute `bitbake`:
@@ -120,9 +128,93 @@ If you are _not_ on a native Linux machine, use the following for flashing:
   >Keep the default options, but when "SELECT"ing a file, make sure to change the filter to `All files (*.*)`. When you plug in your uSD card, Windows will complain. Only focus on the `rufus` application and do not do anything with any explorer windows that pop up.
 - MacOS: [balenaEtcher](https://etcher.balena.io/#download-etcher)
 
+Since this repository builds an image that is intended to run on the Raspberry Pi 4b, you could also use the [Raspberry Pi Imager](https://www.raspberrypi.org/software/) to flash the image.
+
+## Hardware Setup
+
+- [Raspberry Pi 4b](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/)
+  >This repository sets the `MACHINE` variable to `raspberrypi4` by default. Theoretically, any Raspberry Pi Single Board Computer (SBC) should work. If you opt to go with a different Raspberry Pi SBC, `export MACHINE=<your_machine_here>` in your `.userenv` file after finding your machine name [here](meta-raspberrypi/conf/machine).
+- [uSD card](https://a.co/d/j359Wjg)
+  >The generated `.wic` image is  < 600MB, so a 2GB uSD card should be sufficient, but it's always nice having a larger card laying around for future projects.
+- [USB-C power supply](https://www.raspberrypi.com/products/type-c-power-supply/)
+- [Micro HDMI to HDMI cable](https://a.co/d/cD6o5ns) (or adapter if you have an extra HDMI already laying around)
+- [Waveshare 7" Capacitive Touch Display](https://www.waveshare.com/7inch-hdmi-lcd-h.htm)
+  >Having a touchscreen display is not a necessity, but it is nice to actually interact with the device. If you opt to use a different HDMI display, you may want a USB mouse to interact with the UI.
+- [Breadboard kit](https://a.co/d/0r9hxvH)
+- (Optional for debugging) [USB to TTL Serial Cable](https://www.digikey.com/en/products/detail/espressif-systems/ESP-PROG/10259352)
+  >I like the ESP-Prog, but any USB to TTL Serial Cable should work. This is used to monitor the serial output of the Raspberry Pi.
+- (Optional) [Ethernet cable](https://a.co/d/f6xYfYF)
+  >If you do not have a wireless network or do not have an TTL cable to setup your credentials, you can use an ethernet cable to connect the Raspberry Pi to your network.
+
+To hook up your LED to the Raspberry Pi, plug a 5mm LED into the breadboard and connect the longer leg (anode) to GPIO 6 (pin 31) and the shorter leg (cathode) to a 10KΩ resistor, which is then connected to a ground pin (pin 39). See the [Raspberry Pi Pinout](https://www.raspberrypi.com/documentation/computers/images/GPIO-Pinout-Diagram-2.png?hash=df7d7847c57a1ca6d5b2617695de6d46) for exact pin locations.
+
+>If you opt to use a different GPIO pin, be sure to set the correct `LED_GPIO=<your_gpio_here>` in the [`local.conf`](conf/local.conf) file.
+
+![Hardware Diagram](docs/images/machine_control_os_hardware_diagram.png)
+
+![Hardware Setup](docs/images/rpi_machine_control_os_setup.jpg)
+
+![LED Wiring](docs/images/rpi_led_wiring.jpg)
+
+## Serial Monitoring
+
+On the ESP-Prog, we will use the 6-pin breakout section. Below is the pin layout for this section (`x`'s denote pins we don't care about):
+
+```text
+    +--------------+
+    |  x   GND  x  |
+    |  x   TX  RX  |
+    +-----    -----+
+```
+
+>NOTE: Notice the orientation of the break in the bottom of the wall around these pins; please make sure when you are wiring this, that break is facing down/south.
+
+Once you have wires connected to those pins, please connect them to their respective pins on the Raspberry Pi breakout header:
+
+```text
+    +-----------+
+    |  x   x    |
+    |  x   x    |
+    |  x   GND  |
+    |  x   TX   |
+    |  x   RX   |
+    |  x   x    |
+    |  ..  ..   |
+    +-----------+
+```
+
+>NOTE: When looking at the Raspberry Pi, the above diagram assumes an orientation where the pins on the **right** side of the board.
+
+Once the connections are made, you can monitor serial output from your Raspberry Pi by executing `picocom` (`sudo apt install picocom`), `minicom` (`sudo apt install minicom`), or any other serial monitoring tool of your choice after finding your device (`ls /dev/ttyUSB*`) and setting the baud rate to `115200`:
+
+```bash
+# To exit picocom, press Ctrl+A followed by Ctrl+X.
+picocom -b 115200 /dev/ttyUSB1
+```
+
+## A Few Notes
+
+- **The first build will take a long time.** Subsequent builds will be faster due to the caching mechanism of the Yocto Project.
+- If the image was built without wifi credentials, use the following command after creating an TTL connection to the Raspberry Pi:
+
+  ```bash
+  # Setup wifi credentials in the wpa_supplicant.conf file
+  wpa_passphrase "NETWORK_SSID" NETWORK_PASSWORD >> /etc/wpa_supplicant.conf
+
+  # Reconfigure the wpa_supplicant service
+  wpa_cli reconfigure
+  ```
+
+  >Take note of the lack of quotes around `NETWORK_PASSWORD` in the command above. This is intentional as the `wpa_passphrase` command will include the quotes in the generated PSK.
+- The `unleashing-grpc-backend.service` will not start until an IP is obtained on `wlan0` which could take a minute or so. This is because the gRPC server needs a connection in order to serve.
+
 ## Helpful Resources
 
 - [Yocto Project Documentation](https://docs.yoctoproject.org/4.0.11/singleindex.html)
 - [OpenEmbedded Layers Index](https://layers.openembedded.org/layerindex/branch/kirkstone/layers/)
 - [DigiKey Yocto Project Introduction](https://www.youtube.com/playlist?list=PLEBQazB0HUyTpoJoZecRK6PpDG31Y7RPB)
   >The first video in the series is focused on [buildroot](https://buildroot.org/), but the rest of the videos are focused on the Yocto Project.
+
+## Contributing
+
+Want to contribute to this repository? Feel free to open a pull request, file an issue, or make a suggestion!

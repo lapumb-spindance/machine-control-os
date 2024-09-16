@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-# Enter the directory where this script is located. 
+# Enter the directory where this script is located.
 cd $(dirname $0)
 
 # Make sure devcontainer CLI is installed.
@@ -19,4 +19,4 @@ fi
 devcontainer up --workspace-folder ../
 
 # Enter the devcontainer.
-docker exec -w /home/sd-dev/src/yocto-starter-kit -it --user sd-dev yocto-starter-kit zsh
+docker exec -w /home/sd-dev/src/machine-control-os -it --user sd-dev machine-control-os zsh
