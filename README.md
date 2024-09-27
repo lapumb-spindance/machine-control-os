@@ -8,6 +8,12 @@ This repository utilizes the [Yocto Project](https://www.yoctoproject.org/)'s [P
 
 >Note: if you are interested in learning more about embedded Flutter, checkout the [meta-flutter](https://github.com/meta-flutter/meta-flutter) repository and the ["_Getting Started with Flutter for Embedded Linux_" blog](https://spindance.com/2024/07/10/getting-started-with-flutter-for-embedded-linux-2/)!
 
+This repository is referenced in the "_Unleashing gRPC_" blog series. Check out the blogs for more information on what is being built!
+
+Part 1: [Getting Started with Machine Control Using Flutter and gRPC](https://spindance.com/2024/09/23/unleashing-grpc-part-1-getting-started-with-machine-control-using-flutter-and-grpc/)
+
+Part 2: [Diving Deeper into Machine Control Using Flutter with gRPC](https://spindance.com/2024/09/24/unleashing-grpc-part-2-diving-deeper-into-machine-control-using-flutter-with-grpc/)
+
 ## Prerequisites
 
 >:warning: **Yocto Project tooling is required to run in a Linux environment.** If you are on Windows or an Intel-based Mac, you will need to setup a Linux environment. Please note that, although this is tooling in this repository to facilitate developing on Windows/MacOS, **full support is not guaranteed**.
